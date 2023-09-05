@@ -38,6 +38,7 @@ func main() {
 	parseEnvFlags()
 	if viper.GetBool(versionFlag) {
 		fmt.Println(version, commit, date)
+		return
 	}
 	conf := internal_moonmist.GetGenConf(viper.GetString(fileFlag))
 	internal_moonmist.MkdirAll(conf)
@@ -64,22 +65,23 @@ func main() {
 		for _, c := range conf.Codes {
 			switch c.Type {
 			case "ts":
-				runtime.Must(parser.GenerateTSCode(conf.Dir, pkg, allPackages))
+				runtime.Must(parser.GenerateTSCode(c.Out, pkg, allPackages))
 			case "dart":
-				runtime.Must(parser.GenerateDartCode(conf.Dir, pkg, allPackages))
+				runtime.Must(parser.GenerateDartCode(c.Out, pkg, allPackages))
 			case "swift":
-				runtime.Must(parser.GenerateSwiftCode(conf.Dir, pkg, allPackages))
+				runtime.Must(parser.GenerateSwiftCode(c.Out, pkg, allPackages))
 			case "chi_route":
-				runtime.Must(parser.GenerateChiRoutes(conf.Dir, pkg, allPackages))
+				runtime.Must(parser.GenerateChiRoutes(c.Out, pkg, allPackages))
 			case "angular_delon":
-				runtime.Must(parser.GenerateTSAngularDelonCode(conf.Dir, pkg, allPackages))
+				runtime.Must(parser.GenerateTSAngularDelonCode(c.Out, pkg, allPackages))
 			case "proto":
-				runtime.Must(parser.GenerateProtoFile(conf.Dir, currentGoModulePath, pkg, allPackages))
+				runtime.Must(parser.GenerateProtoFile(c.Out, currentGoModulePath, pkg, allPackages))
 			case "gsrv":
-				runtime.Must(parser.GenerateGsrv(conf.Dir, currentGoModulePath, pkg, allPackages))
+				runtime.Must(parser.GenerateGsrv(c.Out, currentGoModulePath, pkg, allPackages))
 			default:
 				panic("unsupported " + c.Type)
 			}
 		}
 	}
+	fmt.Println("done")
 }

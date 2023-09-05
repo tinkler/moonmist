@@ -42,10 +42,10 @@ func (h simple[T]) Handle(w http.ResponseWriter, r *http.Request) {
 	res := Res[T, any]{Data: m.Data}
 	err = h.f(r.Context())
 	if err != nil {
-		handleError(w, err)
+		HandleError(w, err)
 		return
 	}
-	handleResponse(w, res)
+	HandleResponse(w, res)
 }
 
 type simple2[T any, S any] struct {
@@ -67,10 +67,10 @@ func (h simple2[T, S]) Handle(w http.ResponseWriter, r *http.Request) {
 	res := Res[T, any]{Data: m.Data}
 	err = h.f(r.Context(), m.Args)
 	if err != nil {
-		handleError(w, err)
+		HandleError(w, err)
 		return
 	}
-	handleResponse(w, res)
+	HandleResponse(w, res)
 }
 
 type deliver[T any, S any] struct {
@@ -92,10 +92,10 @@ func (h deliver[T, S]) Handle(w http.ResponseWriter, r *http.Request) {
 	res := Res[T, S]{Data: m.Data}
 	res.Resp, err = h.f(r.Context())
 	if err != nil {
-		handleError(w, err)
+		HandleError(w, err)
 		return
 	}
-	handleResponse(w, res)
+	HandleResponse(w, res)
 }
 
 type deliver2[T any, S any, R any] struct {
@@ -117,13 +117,13 @@ func (h deliver2[T, S, R]) Handle(w http.ResponseWriter, r *http.Request) {
 	res := Res[T, R]{Data: m.Data}
 	res.Resp, err = h.f(r.Context(), m.Args)
 	if err != nil {
-		handleError(w, err)
+		HandleError(w, err)
 		return
 	}
-	handleResponse(w, res)
+	HandleResponse(w, res)
 }
 
-func handleResponse(w http.ResponseWriter, res interface{}) {
+func HandleResponse(w http.ResponseWriter, res interface{}) {
 	w.Header().Set("Content-Type", ContentType)
 	byt, err := sjson.Marshal(map[string]interface{}{
 		"code":    0,
@@ -144,7 +144,7 @@ func handleResponse(w http.ResponseWriter, res interface{}) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func handleError(w http.ResponseWriter, err error) {
+func HandleError(w http.ResponseWriter, err error) {
 	switch s := err.(type) {
 	case mst.Status:
 		if s.Code() == http.StatusOK {

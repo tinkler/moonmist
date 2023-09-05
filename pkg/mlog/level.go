@@ -1,15 +1,15 @@
 package mlog
 
-type level uint8
+type Level uint8
 
 var (
-	ConsoleLevel           level = L_SILENT
-	LoggerFileLevel        level = L_NORMAL
+	ConsoleLevel           Level = L_SILENT
+	LoggerFileLevel        Level = L_NORMAL
 	ConsoleMessageSeparate       = "\n<<<<<<\n"
 )
 
 const (
-	_        level = iota
+	_        Level = iota
 	L_SILENT       // print ML_ERR ML_TITLE message
 	L_NORMAL       // print ML_ERR ML_TITLE ML_WARN message
 	L_LOG          // print ML_ERR ML_TITLE ML_WARN ML_INFO message

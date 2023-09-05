@@ -33,6 +33,10 @@ func BadRequest(v ...interface{}) Status {
 	return New(http.StatusBadRequest)
 }
 
+func OK(v ...interface{}) Status {
+	return New(http.StatusOK)
+}
+
 func Any(err error, v ...interface{}) Status {
 	switch err.(type) {
 	case *HttpStatus:

@@ -166,6 +166,9 @@ func ParsePackage(path string, modulePath string) (*Package, error) {
 									}
 									if f.Tag != nil {
 										tag, _ := parseTag(reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get("json"))
+										if tag == "-" {
+											continue
+										}
 										if tag != "" {
 											field.JSON = tag
 										} else {
