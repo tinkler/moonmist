@@ -1,6 +1,6 @@
 package mlog
 
-type Level uint8
+type Level uint16
 
 var (
 	ConsoleLevel           Level = L_SILENT

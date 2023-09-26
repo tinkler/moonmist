@@ -16,7 +16,7 @@ var mlogSourceDir, mstSourceDir string
 func init() {
 	_, file, _, _ := runtime.Caller(0)
 	mlogSourceDir = regexp.MustCompile(`mlog\.go`).ReplaceAllString(file, "")
-	mstSourceDir, _ = filepath.Abs(mlogSourceDir + "/../mst")
+	mstSourceDir = filepath.ToSlash(filepath.Clean(mlogSourceDir + "/../mst"))
 }
 
 func writeRuntimeMessage() string {

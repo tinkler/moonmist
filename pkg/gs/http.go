@@ -141,7 +141,6 @@ func HandleResponse(w http.ResponseWriter, res interface{}) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 }
 
 func HandleError(w http.ResponseWriter, err error) {

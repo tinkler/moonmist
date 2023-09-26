@@ -25,11 +25,12 @@ const (
 )
 
 type Field struct {
-	Name     string
-	JSON     string
-	Type     string
-	Comments []string
-	Options  map[string]string
+	Name      string
+	JSON      string
+	Type      string
+	Omitempty bool
+	Comments  []string
+	Options   map[string]string
 }
 
 type Method struct {
@@ -155,8 +156,12 @@ func ParsePackage(path string, modulePath string) (*Package, error) {
 									if field == nil {
 										continue
 									}
-									if strings.Contains(field.Type, "context.Context") || strings.Contains(field.Type, "gorm") {
+									if strings.Contains(field.Type, "context.Context") {
 										continue
+									}
+									if strings.Contains(field.Type, "gorm.DeletedAt") {
+										field.Type = strings.Replace(field.Type, "gorm.DeletedAt", "time.Time", 1)
+										field.Omitempty = true
 									}
 									for _, n := range f.Names {
 										field.Name = n.Name
@@ -165,9 +170,12 @@ func ParsePackage(path string, modulePath string) (*Package, error) {
 										continue
 									}
 									if f.Tag != nil {
-										tag, _ := parseTag(reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get("json"))
+										tag, opt := parseTag(reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get("json"))
 										if tag == "-" {
 											continue
+										}
+										if opt.Contains("omitempty") {
+											field.Omitempty = true
 										}
 										if tag != "" {
 											field.JSON = tag

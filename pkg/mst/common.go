@@ -8,9 +8,15 @@ import (
 
 func New(code int, v ...interface{}) Status {
 	if len(v) == 0 {
-		mlog.Error(http.StatusText(code))
+		if code != http.StatusOK {
+			mlog.Error(http.StatusText(code))
+		}
+		return &HttpStatus{code: code, msg: http.StatusText(code)}
+	} else {
+		msg := mlog.Format(v[0], v[1:]...)
+		mlog.Error(msg)
+		return &HttpStatus{code: code, msg: msg}
 	}
-	return &HttpStatus{code: code, msg: http.StatusText(code)}
 }
 
 func Unauthorized(v ...interface{}) Status {
@@ -22,7 +28,7 @@ func Forbidden(v ...interface{}) Status {
 }
 
 func InternalServerError(v ...interface{}) Status {
-	return New(http.StatusInternalServerError)
+	return New(http.StatusInternalServerError, v...)
 }
 
 func BadGateway(v ...interface{}) Status {
@@ -34,7 +40,7 @@ func BadRequest(v ...interface{}) Status {
 }
 
 func OK(v ...interface{}) Status {
-	return New(http.StatusOK)
+	return New(http.StatusOK, v...)
 }
 
 func Any(err error, v ...interface{}) Status {

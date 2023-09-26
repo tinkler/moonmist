@@ -233,6 +233,7 @@ func GenerateProtoFile(path string, moduleBasePath string, pkg *Package, dep map
 		usedDepStruct = make(map[string]map[string]bool)
 		hasMethods    bool
 		hasInterface  bool
+		hasTime       bool
 	)
 	for _, s := range pkg.Structs {
 		fields := s.Fields
@@ -246,9 +247,12 @@ func GenerateProtoFile(path string, moduleBasePath string, pkg *Package, dep map
 			if strings.Contains(typ, "interface") {
 				hasInterface = true
 			}
+			if strings.Contains(typ, "time.Time") {
+				hasTime = true
+			}
 		FIND:
 			typ = strings.TrimPrefix(typ, "*")
-			if _, isBt := tsTypeMap[typ]; !isBt {
+			if _, isBt := protoTypeMap[typ]; !isBt {
 				if FindStruct(pkg, typ) == nil {
 					if dep != nil {
 						if nameSlice := strings.Split(typ, "."); len(nameSlice) > 1 {
@@ -305,6 +309,9 @@ func GenerateProtoFile(path string, moduleBasePath string, pkg *Package, dep map
 	}
 	if hasInterface {
 		protoFile.WriteString(fmt.Sprintln("import \"google/protobuf/struct.proto\";"))
+	}
+	if hasTime {
+		protoFile.WriteString(fmt.Sprintln("import \"google/protobuf/timestamp.proto\";"))
 	}
 
 	if len(usedDepStruct) > 0 {
@@ -1346,7 +1353,7 @@ func GenerateDartCode(path string, pkg *Package, dep map[string]*Package) error 
 			typ := f.Type
 		FIND:
 			typ = strings.TrimPrefix(typ, "*")
-			if _, isBt := tsTypeMap[typ]; !isBt {
+			if _, isBt := dartTypeMap[typ]; !isBt {
 				if FindStruct(pkg, typ) == nil {
 					if dep != nil {
 						if nameSlice := strings.Split(typ, "."); len(nameSlice) > 1 {
@@ -1608,7 +1615,7 @@ var dartModelTemplate = `{{$name := .Name}}
 {{range .Structs}}{{$struct := .}}
 class {{.Name}} {
 	{{range .Fields}}
-	final {{.Type | toType}}{{if .Type | canNull}}?{{end}} {{.Name | toCamel}};
+	final {{.Type | toType}}{{if (or (.Type | canNull) .Omitempty)}}?{{end}} {{.Name | toCamel}};
 	{{end}}
 	
 	const {{.Name}}(
@@ -1623,7 +1630,7 @@ class {{.Name}} {
 			{{end}}
 		}) {
 		return {{.Name}}(
-			{{range .Fields}}{{.Name | toCamel}}: {{.Name | toCamel}}{{if .Type | canNull}}{{else}} ?? {{.Type | toDefault}}{{end}},
+			{{range .Fields}}{{.Name | toCamel}}: {{.Name | toCamel}}{{if (or (.Type | canNull) .Omitempty)}}{{else}} ?? {{.Type | toDefault}}{{end}},
 			{{end}}
 		);
 	}
@@ -1665,15 +1672,12 @@ class {{.Name}} {
 			"data": toJson(),
 			"args": { {{range .Args}}"{{.Name | toSnack}}": {{.Name | toCamel}},{{end}} }
 		});
-		if (response.data['code'] == 0) {
-			var responseModel = {{$struct.Name}}.fromJson(response.data['data']['data']);
-			{{if .Rets}}if (response.data['data']['resp'] != null) {
-				return (responseModel,{{(index .Rets 0).Type | returnArgs}});
-			}
-			{{end}}
-			return responseModel;
+		var responseModel = {{$struct.Name}}.fromJson(response.data['data']);
+		{{if .Rets}}if (response.data['resp'] != null) {
+			return (responseModel,{{(index .Rets 0).Type | returnArgs}});
 		}
-		return {{$struct.Name}}.empty();
+		{{end}}
+		return responseModel;
 	}
 	{{end}}{{end}}
 }

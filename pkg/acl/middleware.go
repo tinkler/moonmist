@@ -14,15 +14,15 @@ const (
 	userKey contextKey = "user"
 )
 
-func Use(tokenParser func(ctx context.Context) (User, error)) func(next http.HandlerFunc) http.HandlerFunc {
-	return func(next http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			u, err := tokenParser(r.Context())
+func Use(tokenParser func(r *http.Request) (User, error)) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			u, err := tokenParser(r)
 			if err != nil {
 				gs.HandleError(w, mst.Any(err))
 				return
 			}
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), userKey, u)))
-		}
+		})
 	}
 }
