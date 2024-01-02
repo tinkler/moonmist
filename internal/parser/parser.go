@@ -12,7 +12,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/tinkler/moonmist/pkg/jsonz/sjson"
+	"github.com/tinkler/moonmist/pkg/jsonz/cjson"
 )
 
 type MethodType uint8
@@ -180,10 +180,10 @@ func ParsePackage(path string, modulePath string) (*Package, error) {
 										if tag != "" {
 											field.JSON = tag
 										} else {
-											field.JSON = sjson.ToSnackedName(field.Name)
+											field.JSON = cjson.ToCamelCase(field.Name)
 										}
 									} else {
-										field.JSON = sjson.ToSnackedName(field.Name)
+										field.JSON = cjson.ToCamelCase(field.Name)
 									}
 
 									if f.Comment != nil {

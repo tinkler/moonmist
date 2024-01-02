@@ -20,11 +20,11 @@ func New(code int, v ...interface{}) Status {
 }
 
 func Unauthorized(v ...interface{}) Status {
-	return New(http.StatusUnauthorized)
+	return New(http.StatusUnauthorized, v...)
 }
 
 func Forbidden(v ...interface{}) Status {
-	return New(http.StatusForbidden)
+	return New(http.StatusForbidden, v...)
 }
 
 func InternalServerError(v ...interface{}) Status {
@@ -32,18 +32,22 @@ func InternalServerError(v ...interface{}) Status {
 }
 
 func BadGateway(v ...interface{}) Status {
-	return New(http.StatusBadGateway)
+	return New(http.StatusBadGateway, v...)
 }
 
 func BadRequest(v ...interface{}) Status {
-	return New(http.StatusBadRequest)
+	return New(http.StatusBadRequest, v...)
 }
 
 func OK(v ...interface{}) Status {
 	return New(http.StatusOK, v...)
 }
 
+// TODO: v as err
 func Any(err error, v ...interface{}) Status {
+	if err == nil {
+		return nil
+	}
 	switch err.(type) {
 	case *HttpStatus:
 		return err.(Status)

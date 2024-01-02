@@ -6,7 +6,7 @@ import (
 	"github.com/tinkler/moonmist/pkg/jsonz"
 )
 
-func ToSnackedName(name string) string {
+func ToSnakedName(name string) string {
 	if name == "" {
 		return ""
 	}

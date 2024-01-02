@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/tinkler/moonmist/pkg/jsonz/sjson"
 	"github.com/tinkler/moonmist/pkg/mlog"
 	"github.com/tinkler/moonmist/pkg/mst"
 )
@@ -34,7 +33,7 @@ func Simple[T any](v T, f func(ctx context.Context) error) simple[T] {
 
 func (h simple[T]) Handle(w http.ResponseWriter, r *http.Request) {
 	m := Model[T, any]{Data: h.v}
-	err := sjson.Bind(r, &m)
+	err := Bind(r, &m)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -59,13 +58,38 @@ func Simple2[T any, S any](v T, f func(ctx context.Context, args S) error) simpl
 
 func (h simple2[T, S]) Handle(w http.ResponseWriter, r *http.Request) {
 	m := Model[T, S]{Data: h.v}
-	err := sjson.Bind(r, &m)
+	err := Bind(r, &m)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	res := Res[T, any]{Data: m.Data}
 	err = h.f(r.Context(), m.Args)
+	if err != nil {
+		HandleError(w, err)
+		return
+	}
+	HandleResponse(w, res)
+}
+
+type consumer[T any, R any] struct {
+	v T
+	f func(ctx context.Context) (R, error)
+}
+
+func Consume[T any, R any](v T, f func(ctx context.Context) (R, error)) consumer[T, R] {
+	return consumer[T, R]{}
+}
+
+func (s consumer[T, R]) Handle(w http.ResponseWriter, r *http.Request) {
+	m := Model[T, any]{Data: s.v}
+	err := Bind(r, &m)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	res := Res[T, R]{Data: m.Data}
+	res.Resp, err = s.f(r.Context())
 	if err != nil {
 		HandleError(w, err)
 		return
@@ -84,7 +108,7 @@ func Deliver[T any, S any](d T, f func(ctx context.Context) (S, error)) deliver[
 
 func (h deliver[T, S]) Handle(w http.ResponseWriter, r *http.Request) {
 	m := Model[T, any]{Data: h.v}
-	err := sjson.Bind(r, &m)
+	err := Bind(r, &m)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -109,7 +133,7 @@ func Deliver2[T any, S any, R any](d T, f func(ctx context.Context, args S) (R, 
 
 func (h deliver2[T, S, R]) Handle(w http.ResponseWriter, r *http.Request) {
 	m := Model[T, S]{Data: h.v}
-	err := sjson.Bind(r, &m)
+	err := Bind(r, &m)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -125,7 +149,7 @@ func (h deliver2[T, S, R]) Handle(w http.ResponseWriter, r *http.Request) {
 
 func HandleResponse(w http.ResponseWriter, res interface{}) {
 	w.Header().Set("Content-Type", ContentType)
-	byt, err := sjson.Marshal(map[string]interface{}{
+	byt, err := json.Marshal(map[string]interface{}{
 		"code":    0,
 		"message": "",
 		"data":    res,

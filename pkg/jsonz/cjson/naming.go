@@ -7,7 +7,7 @@ import (
 )
 
 // lower first letter
-func ToCamel(name string) string {
+func ToCamelCase(name string) string {
 	if name == "" {
 		return ""
 	}
@@ -16,7 +16,7 @@ func ToCamel(name string) string {
 }
 
 // SnakeCase to FullCamelCase
-func SnakeCaseToFullCamelCase(name string) string {
+func SnakedToFullCamelCase(name string) string {
 	if name == "" {
 		return ""
 	}

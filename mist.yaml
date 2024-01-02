@@ -1,0 +1,6 @@
+middlewares:
+  - name: db
+    configs:
+      - name: default
+        driver: postgres
+        dsn: "host=192.168.8.18 user=moonerp password=moonerp4105 dbname=moonerp port=5432 sslmode=disable TimeZone=Asia/Shanghai search_path=authv1"

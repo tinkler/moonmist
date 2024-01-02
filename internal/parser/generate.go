@@ -125,13 +125,13 @@ func GenerateChiRoutes(path string, pkg *Package, dep map[string]*Package) error
 				return fmt.Sprintf("%s.%s", pkg.Name, typ)
 			},
 			"toSnack": func(s string) string {
-				return sjson.ToSnackedName(s)
+				return sjson.ToSnakedName(s)
 			},
 			"toFulle": func(s string) string {
-				return cjson.SnakeCaseToFullCamelCase(s)
+				return cjson.SnakedToFullCamelCase(s)
 			},
 			"toMinus": func(s string) string {
-				return strings.ReplaceAll(sjson.ToSnackedName(s), "_", "-")
+				return strings.ReplaceAll(sjson.ToSnakedName(s), "_", "-")
 			},
 		}).Parse(goChiRouteTemplate))
 		if err := t.Execute(f, pkg); err != nil {
@@ -162,13 +162,13 @@ func GenerateChiRoutes(path string, pkg *Package, dep map[string]*Package) error
 					return fmt.Sprintf("%s.%s", pkg.Name, typ)
 				},
 				"toSnack": func(s string) string {
-					return sjson.ToSnackedName(s)
+					return sjson.ToSnakedName(s)
 				},
 				"toFulle": func(s string) string {
-					return cjson.SnakeCaseToFullCamelCase(s)
+					return cjson.SnakedToFullCamelCase(s)
 				},
 				"toMinus": func(s string) string {
-					return strings.ReplaceAll(sjson.ToSnackedName(s), "_", "-")
+					return strings.ReplaceAll(sjson.ToSnakedName(s), "_", "-")
 				},
 			}).Parse(goChiRouteDebugPathTemplate))
 			if err := t.Execute(debugPathFile, pkg); err != nil {
@@ -366,13 +366,13 @@ func GenerateProtoFile(path string, moduleBasePath string, pkg *Package, dep map
 				}
 				goType = "map<" + mapKey + "," + goType + ">"
 			}
-			protoFile.WriteString(fmt.Sprintf("\t%s %s = %d;\n", goType, sjson.ToSnackedName(f.Name), pp.GetSequence(sjson.ToSnackedName(s.Name), sjson.ToSnackedName(f.Name))))
+			protoFile.WriteString(fmt.Sprintf("\t%s %s = %d;\n", goType, sjson.ToSnakedName(f.Name), pp.GetSequence(sjson.ToSnakedName(s.Name), sjson.ToSnakedName(f.Name))))
 		}
 		protoFile.WriteString(fmt.Sprintln("}"))
 		protoFile.WriteString(fmt.Sprintln())
 	}
 
-	protoFile.WriteString(fmt.Sprintln("service " + cjson.SnakeCaseToFullCamelCase(pkg.Name) + "Gsrv {"))
+	protoFile.WriteString(fmt.Sprintln("service " + cjson.SnakedToFullCamelCase(pkg.Name) + "Gsrv {"))
 	for _, s := range pkg.Structs {
 		for _, m := range s.Methods {
 			switch m.Type {
@@ -498,10 +498,10 @@ func GenerateGsrv(path string, modulePath string, pkg *Package, dep map[string]*
 
 	t := template.New("gsrc").Funcs(template.FuncMap{
 		"toFulle": func(s string) string {
-			return cjson.SnakeCaseToFullCamelCase(s)
+			return cjson.SnakedToFullCamelCase(s)
 		},
 		"toCamel": func(s string) string {
-			return cjson.ToCamel(s)
+			return cjson.ToCamelCase(s)
 		},
 		"toType": func(goType string) string {
 			prefix := ""
@@ -718,7 +718,7 @@ func (s *{{$.Name}}Gsrv) {{$struct.Name}}{{.Name}}(stream pb_{{$.Name}}_v1.{{$.N
 // GenerateTSCode generate ts code
 func GenerateTSCode(path string, pkg *Package, dep map[string]*Package) error {
 
-	f, err := os.Create(filepath.Join(path, fmt.Sprintf("%s.ts", sjson.ToSnackedName(pkg.Name))))
+	f, err := os.Create(filepath.Join(path, fmt.Sprintf("%s.ts", sjson.ToSnakedName(pkg.Name))))
 	if err != nil {
 		return err
 	}
@@ -815,13 +815,13 @@ func GenerateTSCode(path string, pkg *Package, dep map[string]*Package) error {
 				return ""
 			},
 			"toCamel": func(s string) string {
-				return cjson.ToCamel(s)
+				return cjson.ToCamelCase(s)
 			},
 			"toSnack": func(s string) string {
-				return sjson.ToSnackedName(s)
+				return sjson.ToSnakedName(s)
 			},
 			"toMinus": func(s string) string {
-				return strings.ReplaceAll(sjson.ToSnackedName(s), "_", "-")
+				return strings.ReplaceAll(sjson.ToSnakedName(s), "_", "-")
 			},
 			"toDefault": func(s string) string {
 				if strings.HasSuffix(s, "[]") {
@@ -930,19 +930,19 @@ func GenerateTSAngularDelonCode(path string, pkg *Package, dep map[string]*Packa
 		serviceSpecFile *os.File
 		modelFile       *os.File
 	)
-	serviceFile, err := os.Create(filepath.Join(path, fmt.Sprintf("%s.service.ts", sjson.ToSnackedName(pkg.Name))))
+	serviceFile, err := os.Create(filepath.Join(path, fmt.Sprintf("%s.service.ts", sjson.ToSnakedName(pkg.Name))))
 	if err != nil {
 		return err
 	}
 	defer serviceFile.Close()
 
-	serviceSpecFile, err = os.Create(filepath.Join(path, fmt.Sprintf("%s.spec.ts", sjson.ToSnackedName(pkg.Name))))
+	serviceSpecFile, err = os.Create(filepath.Join(path, fmt.Sprintf("%s.spec.ts", sjson.ToSnakedName(pkg.Name))))
 	if err != nil {
 		return err
 	}
 	defer serviceSpecFile.Close()
 
-	modelFile, err = os.Create(filepath.Join(path, fmt.Sprintf("%s.model.ts", sjson.ToSnackedName(pkg.Name))))
+	modelFile, err = os.Create(filepath.Join(path, fmt.Sprintf("%s.model.ts", sjson.ToSnakedName(pkg.Name))))
 	if err != nil {
 		return err
 	}
@@ -1099,13 +1099,13 @@ func GenerateTSAngularDelonCode(path string, pkg *Package, dep map[string]*Packa
 				return ""
 			},
 			"toCamel": func(s string) string {
-				return cjson.ToCamel(s)
+				return cjson.ToCamelCase(s)
 			},
 			"toSnack": func(s string) string {
-				return sjson.ToSnackedName(s)
+				return sjson.ToSnakedName(s)
 			},
 			"toMinus": func(s string) string {
-				return strings.ReplaceAll(sjson.ToSnackedName(s), "_", "-")
+				return strings.ReplaceAll(sjson.ToSnakedName(s), "_", "-")
 			},
 			"toDefault": func(s string) string {
 				if strings.HasPrefix(s, "[]") {
@@ -1171,7 +1171,7 @@ func GenerateTSAngularDelonCode(path string, pkg *Package, dep map[string]*Packa
 						content += "for(const item of res.data.resp) {"
 						content += "const _new = new " + s.Name + "(this.http);"
 						for _, f := range s.Fields {
-							content += "_new." + cjson.ToCamel(f.Name) + " = item['" + sjson.ToSnackedName(f.Name) + "'];"
+							content += "_new." + cjson.ToCamelCase(f.Name) + " = item['" + sjson.ToSnakedName(f.Name) + "'];"
 						}
 						content += "resp.push(_new);"
 						content += "}"
@@ -1179,7 +1179,7 @@ func GenerateTSAngularDelonCode(path string, pkg *Package, dep map[string]*Packa
 					}
 					content := "const resp: " + s.Name + " = new " + s.Name + "(this.http);"
 					for _, f := range s.Fields {
-						content += "resp." + cjson.ToCamel(f.Name) + " = res.data.resp['" + sjson.ToSnackedName(f.Name) + "'];"
+						content += "resp." + cjson.ToCamelCase(f.Name) + " = res.data.resp['" + sjson.ToSnakedName(f.Name) + "'];"
 					}
 					return content
 				}
@@ -1329,7 +1329,7 @@ describe('{{.Name | firstUpper}}Service', () => {
 
 // GenerateDartCode generate dart code
 func GenerateDartCode(path string, pkg *Package, dep map[string]*Package) error {
-	sourcePath := filepath.Join(path, fmt.Sprintf("%s.dart", sjson.ToSnackedName(pkg.Name)))
+	sourcePath := filepath.Join(path, fmt.Sprintf("%s.dart", sjson.ToSnakedName(pkg.Name)))
 	f, err := os.Create(sourcePath)
 	if err != nil {
 		return err
@@ -1449,16 +1449,19 @@ func GenerateDartCode(path string, pkg *Package, dep map[string]*Package) error 
 			return goType
 		},
 		"toCamel": func(s string) string {
-			return cjson.ToCamel(s)
+			return cjson.ToCamelCase(s)
 		},
 		"toSnack": func(s string) string {
-			return sjson.ToSnackedName(s)
+			return sjson.ToSnakedName(s)
 		},
 		"toMinus": func(s string) string {
-			return strings.ReplaceAll(sjson.ToSnackedName(s), "_", "-")
+			return strings.ReplaceAll(sjson.ToSnakedName(s), "_", "-")
 		},
 		"canNull": func(goType string) bool {
 			return strings.HasPrefix(goType, "*")
+		},
+		"toDefaultType": func(goType string) string {
+			return dartTypeMap[goType]
 		},
 		"toDefault": func(goType string) string {
 			if strings.HasPrefix(goType, "*") {
@@ -1670,14 +1673,15 @@ class {{.Name}} {
 		dio ??= Dio();
 		var response = await dio.post('/{{$name}}/{{$struct.Name | toSnack}}/{{.Name | toMinus}}', data: {
 			"data": toJson(),
-			"args": { {{range .Args}}"{{.Name | toSnack}}": {{.Name | toCamel}},{{end}} }
+			"args": { {{range .Args}}"{{.Name | toCamel}}": {{.Name | toCamel}},{{end}} }
 		});
 		var responseModel = {{$struct.Name}}.fromJson(response.data['data']);
 		{{if .Rets}}if (response.data['resp'] != null) {
-			return (responseModel,{{(index .Rets 0).Type | returnArgs}});
+			return (responseModel,{{(index .Rets 0).Type | returnArgs}} as {{(index .Rets 0).Type | toDefaultType}});
 		}
 		{{end}}
-		return responseModel;
+		{{if .Rets}} return (responseModel, {{(index .Rets 0).Type | toDefault}});
+		{{else}}return responseModel;{{end}}
 	}
 	{{end}}{{end}}
 }
@@ -1692,13 +1696,13 @@ func GenerateSwiftCode(path string, pkg *Package, _ map[string]*Package) error {
 			return swiftTypeMap[goType]
 		},
 		"toCamel": func(s string) string {
-			return cjson.ToCamel(s)
+			return cjson.ToCamelCase(s)
 		},
 		"toDefault": func(s string) string {
 			return swiftDefaultValue[swiftTypeMap[s]]
 		},
 	}).Parse(swiftModelTemplate))
-	f, err := os.Create(filepath.Join(path, cjson.SnakeCaseToFullCamelCase(pkg.Name)+".swift"))
+	f, err := os.Create(filepath.Join(path, cjson.SnakedToFullCamelCase(pkg.Name)+".swift"))
 	if err != nil {
 		return err
 	}

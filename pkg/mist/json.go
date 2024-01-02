@@ -1,10 +1,16 @@
-package sjson
+package mist
 
 import (
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+func init() {
+	json.RegisterExtension(&snakedNamedExtension{})
+}
 
 type snakedNamedExtension struct {
 	jsoniter.DummyExtension
@@ -13,12 +19,10 @@ type snakedNamedExtension struct {
 func (ex *snakedNamedExtension) UpdateStructDescriptor(structDescriptor *jsoniter.StructDescriptor) {
 	for _, field := range structDescriptor.Fields {
 		names := make([]string, len(field.ToNames))
-		tag, _, _ := strings.Cut(field.Field.Tag().Get("json"), ",")
-		for i, old := range field.ToNames {
+		tag, _, _ := strings.Cut(field.Field.Tag().Get("yaml"), ",")
+		for i := range field.ToNames {
 			if tag != "" {
 				names[i] = tag
-			} else {
-				names[i] = ToSnakedName(old)
 			}
 		}
 		field.ToNames = names
