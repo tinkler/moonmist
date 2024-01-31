@@ -48,10 +48,13 @@ func (fl *oneFileLogger) NewFile() {
 	var lf LogFile = &logFile{
 		path: filepath.Join(fl.rootPath, newFileTime.Format("2006-01-02")+".log"),
 	}
-	err := fl.file.Close()
-	if err != nil {
-		return
+	if fl.file != nil {
+		err := fl.file.Close()
+		if err != nil {
+			Error(err)
+		}
 	}
+
 	fl.file = lf
 	fl.fileTime = newFileTime
 }
