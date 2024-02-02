@@ -82,39 +82,49 @@ func (fl *separateFileLogger) NewFile() {
 	newFilePath := func(name string) string {
 		return fmt.Sprintf(filepath.Join(fl.rootPath, newFileTime.Format("2006-01-02")+".%s.log"), name)
 	}
+
 	var errFile LogFile = &logFile{
 		path: newFilePath("err"),
 	}
-	err := fl.errFile.Close()
-	if err != nil {
-		return
+	if fl.errFile != nil {
+		err := fl.errFile.Close()
+		if err != nil {
+			return
+		}
+
 	}
 	fl.errFile = errFile
 
 	var warnFile LogFile = &logFile{
 		path: newFilePath("warn"),
 	}
-	err = fl.warnFile.Close()
-	if err != nil {
-		return
+	if fl.warnFile != nil {
+		err := fl.warnFile.Close()
+		if err != nil {
+			return
+		}
 	}
 	fl.warnFile = warnFile
 
 	var infoFile LogFile = &logFile{
 		path: newFilePath("info"),
 	}
-	err = fl.infoFile.Close()
-	if err != nil {
-		return
+	if fl.infoFile != nil {
+		err := fl.infoFile.Close()
+		if err != nil {
+			return
+		}
 	}
 	fl.infoFile = infoFile
 
 	var debugFile LogFile = &logFile{
 		path: newFilePath("debug"),
 	}
-	err = fl.debugFile.Close()
-	if err != nil {
-		return
+	if fl.debugFile != nil {
+		err := fl.debugFile.Close()
+		if err != nil {
+			return
+		}
 	}
 	fl.debugFile = debugFile
 
