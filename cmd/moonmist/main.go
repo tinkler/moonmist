@@ -20,13 +20,13 @@ var (
 )
 
 const (
-	versionFlag = "version"
-	fileFlag    = "file"
+	flagVersion = "version"
+	flagFile    = "file"
 )
 
 func parseEnvFlags() {
-	pflag.Bool(versionFlag, false, "print version and exit")
-	pflag.StringP(fileFlag, "f", "mist.yaml", "moonmist config file")
+	pflag.Bool(flagVersion, false, "print version and exit")
+	pflag.StringP(flagFile, "f", "mist.yaml", "moonmist config file")
 	pflag.Parse()
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
@@ -36,11 +36,18 @@ func parseEnvFlags() {
 
 func main() {
 	parseEnvFlags()
-	if viper.GetBool(versionFlag) {
+	if viper.GetBool(flagVersion) {
 		fmt.Println(version, commit, date)
 		return
 	}
-	conf := internal_moonmist.GetGenConf(viper.GetString(fileFlag))
+	root, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	if len(os.Args) > 1 {
+		root = filepath.Join(root, os.Args[1])
+	}
+	conf := internal_moonmist.GetGenConf(viper.GetString(flagFile), root)
 	internal_moonmist.MkdirAll(conf)
 	currentGoModulePath := parser.GetModulePath()
 	allPackages := make(map[string]*parser.Package)

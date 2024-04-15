@@ -3,6 +3,7 @@ package internal_moonmist
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
@@ -17,12 +18,13 @@ type GenCodeConf struct {
 	Out  string `yaml:"out"`
 }
 
-func GetGenConf(path string) *GenConf {
+func GetGenConf(path string, root string) *GenConf {
 	conf := &GenConf{}
-	fileData, err := os.ReadFile(path)
+	confFilePath := filepath.Join(root, path)
+	fileData, err := os.ReadFile(confFilePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return defaultGenConf()
+			return defaultGenConf(root)
 		}
 		panic(err)
 	}
@@ -30,11 +32,15 @@ func GetGenConf(path string) *GenConf {
 	if err != nil {
 		panic(err)
 	}
+	conf.Dir = filepath.Join(root, conf.Dir)
+	for _, c := range conf.Codes {
+		c.Out = filepath.Join(root, c.Out)
+	}
 	return conf
 }
 
-func defaultGenConf() *GenConf {
+func defaultGenConf(root string) *GenConf {
 	return &GenConf{
-		Dir: "./pkg/model",
+		Dir: filepath.Join(root, "./pkg/model"),
 	}
 }
