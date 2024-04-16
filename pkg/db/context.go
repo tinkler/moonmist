@@ -8,13 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func Use(db *gorm.DB) func(next http.Handler) http.Handler {
-	if db == nil {
+func Use(dbs map[string]*gorm.DB) func(next http.Handler) http.Handler {
+	if dbs == nil {
 		panic("db is nil")
 	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			newCtx := context.WithValue(r.Context(), runtime.DBContextKey, db)
+			newCtx := context.WithValue(r.Context(), runtime.DBContextKey, dbs)
 			next.ServeHTTP(w, r.WithContext(newCtx))
 		})
 	}
