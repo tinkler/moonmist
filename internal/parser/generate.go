@@ -88,9 +88,8 @@ func GenerateChiRoutes(path string, pkg *Package, dep map[string]*Package) error
 
 		f.WriteString(fmt.Sprintln("\t\"github.com/go-chi/chi/v5\""))
 		if hasMethods {
-			f.WriteString(fmt.Sprintln("\t\"github.com/tinkler/mqttadmin/pkg/jsonz/sjson\""))
+			f.WriteString(fmt.Sprintln("\t\"github.com/tinkler/moonmist/pkg/gs\""))
 			f.WriteString(fmt.Sprintf("\t\"%s\"\n", pkg.ImportsMap[pkg.Name]))
-			f.WriteString(fmt.Sprintln("\t\"github.com/tinkler/mqttadmin/pkg/status\""))
 		}
 		for _, importName := range pkg.Imports {
 			if _, used := usedDepStruct[importName]; used {
@@ -182,33 +181,14 @@ func GenerateChiRoutes(path string, pkg *Package, dep map[string]*Package) error
 
 // go route template
 const goChiRouteTemplate = `
-func Routes{{.Name | toFulle}}(m chi.Router) {
-	m.Route("/{{.Name}}", func(r chi.Router) {
-		{{range .Structs}}{{$struct := .}}{{range .Methods}}{{if eq .Type 0}}
-		r.Post("/{{$struct.Name | toSnack}}/{{.Name | toMinus}}", func(w http.ResponseWriter, r *http.Request) {
-			m := Model[*{{$struct.Name | toType}}, {{if .Args}}struct{
-				{{range .Args}}{{.Name | toFulle}} {{.Type | toType}} 
-				{{end}} } {{else}}any{{end}}]{}
-			err := sjson.Bind(r, &m)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-			res := Res[*{{$struct.Name | toType}},{{if ge (len .Rets) 1}}{{(index .Rets 0).Type | toType}}{{else}}any{{end}}]{Data:m.Data}
-			{{if .Args}}{{if ge (len .Rets) 1}}res.Resp, err = m.Data.{{.Name}}(r.Context(){{if .Args}}, {{$rl := (len .Args)}}{{range $index,$arg := .Args}}m.Args.{{$arg.Name | toFulle}}{{if lt $index $rl}}, {{end}}{{end}}{{end}})
-			{{else}}err = m.Data.{{.Name}}(r.Context(){{if .Args}}, {{$rl := (len .Args)}}{{range $index,$arg := .Args}}m.Args.{{$arg.Name | toFulle}}{{if lt $index $rl}}, {{end}}{{end}}{{end}})
-			{{end}}{{else}}{{if ge (len .Rets) 1}}res.Resp, err = m.Data.{{.Name}}(r.Context())
-			{{else}}err = m.Data.{{.Name}}(r.Context())
-			{{end}}{{end}}
-			if status.HttpError(w, err) {
-				return
-			}
-			if sjson.HttpWrite(w, res) {
-				return
-			}
-
-		}){{end}}{{end}}{{end}}
-	})
+func Routes{{.Name | toFulle}}(r chi.Router) {
+	{{range .Structs}}{{$struct := .}}{{range .Methods}}{{if eq .Type 0}}
+	r.Post("/{{$struct.Name | toSnack}}/{{.Name | toMinus}}", func(w http.ResponseWriter, r *http.Request) {
+		m := new({{$struct.Name | toType}})
+		{{if .Args}}gs.Simple2(m, m.{{.Name}}).Handle(w, r)
+		{{else}}gs.Simple(m, m.{{.Name}}).Handle(w, r)
+		{{end}}
+	}){{end}}{{end}}{{end}}
 }
 `
 
@@ -387,6 +367,7 @@ func GenerateProtoFile(path string, moduleBasePath string, pkg *Package, dep map
 
 	// generate proto file by proto tool
 	cmd := exec.Command("protoc", "-I", path, "--go_out=.", "--go_opt=paths=source_relative", "--go-grpc_out=.", "--go-grpc_opt=paths=source_relative", "--proto_path=.", protoPath)
+	cmd.Dir = path
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()

@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/emicklei/proto v1.12.2
+	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/json-iterator/go v1.1.12
 	github.com/spf13/pflag v1.0.5

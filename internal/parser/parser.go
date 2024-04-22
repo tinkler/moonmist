@@ -113,8 +113,8 @@ func ParsePackage(path string, modulePath string) (*Package, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	path = modulePath + "/" + strings.TrimPrefix(strings.TrimPrefix(strings.ReplaceAll(path, string(filepath.Separator), "/"), "./"), "../")
+	re := regexp.MustCompile(`.*` + strings.ReplaceAll(modulePath, ".", `\.`))
+	path = modulePath + re.ReplaceAllString(strings.ReplaceAll(path, string(filepath.Separator), "/"), "")
 	for _, p := range pkgs {
 		pkg.Name = p.Name
 		pkg.ImportsMap[pkg.Name] = path

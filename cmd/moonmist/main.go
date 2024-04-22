@@ -49,7 +49,7 @@ func main() {
 	}
 	conf := internal_moonmist.GetGenConf(viper.GetString(flagFile), root)
 	internal_moonmist.MkdirAll(conf)
-	currentGoModulePath := parser.GetModulePath()
+	currentGoModulePath := parser.GetModulePath(root)
 	allPackages := make(map[string]*parser.Package)
 	runtime.Must(filepath.Walk(conf.Dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -64,6 +64,9 @@ func main() {
 		pkg, err := parser.ParsePackage(path, currentGoModulePath)
 		if err != nil {
 			panic(err)
+		}
+		if pkg.Name == "" {
+			return nil
 		}
 		allPackages[pkg.Name] = pkg
 		return nil

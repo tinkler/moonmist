@@ -6,7 +6,8 @@ import (
 )
 
 func TestGenerateGoCode(t *testing.T) {
-	modulePath := GetModulePath() + "/pkg"
+	root, _ := os.Getwd()
+	modulePath := GetModulePath(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -36,7 +37,8 @@ func TestGenerateGoCode(t *testing.T) {
 
 func TestGenerateProtoFile(t *testing.T) {
 	_ = os.Chdir("../../")
-	modulePath := GetModulePath()
+	root, _ := os.Getwd()
+	modulePath := GetModulePath(root)
 	pkg, err := ParsePackage("./pkg/model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -68,7 +70,8 @@ func TestGenerateProtoFile(t *testing.T) {
 
 func TestGenerateGsrv(t *testing.T) {
 	_ = os.Chdir("../../")
-	modulePath := GetModulePath()
+	root, _ := os.Getwd()
+	modulePath := GetModulePath(root)
 	pkg, err := ParsePackage("./pkg/model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -98,7 +101,8 @@ func TestGenerateGsrv(t *testing.T) {
 }
 
 func TestGenerateTSCode(t *testing.T) {
-	modulePath := GetModulePath() + "/pkg"
+	root, _ := os.Getwd()
+	modulePath := GetModulePath(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -130,7 +134,8 @@ func TestGenerateTSCode(t *testing.T) {
 }
 
 func TestGenerateTSAngularDelonCode(t *testing.T) {
-	modulePath := GetModulePath() + "/pkg"
+	root, _ := os.Getwd()
+	modulePath := GetModulePath(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -162,7 +167,8 @@ func TestGenerateTSAngularDelonCode(t *testing.T) {
 }
 
 func TestGenerateDartCode(t *testing.T) {
-	modulePath := GetModulePath() + "/pkg"
+	root, _ := os.Getwd()
+	modulePath := GetModulePath(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -191,7 +197,8 @@ func TestGenerateDartCode(t *testing.T) {
 }
 
 func TestGenerateSwiftCode(t *testing.T) {
-	modulePath := GetModulePath() + "/pkg"
+	root, _ := os.Getwd()
+	modulePath := GetModulePath(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)

@@ -9,7 +9,8 @@ func TestGetModulePath(t *testing.T) {
 	if err := os.Chdir("../.."); err != nil {
 		t.Fatal(err)
 	}
-	if GetModulePath() != "github.com/tinkler/mqttadmin" {
+	root, _ := os.Getwd()
+	if GetModulePath(root) != "github.com/tinkler/mqttadmin" {
 		t.Fail()
 	}
 }

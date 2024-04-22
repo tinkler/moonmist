@@ -14,7 +14,9 @@ func New(code int, v ...interface{}) Status {
 		return &HttpStatus{code: code, msg: http.StatusText(code)}
 	} else {
 		msg := mlog.Format(v[0], v[1:]...)
-		mlog.Error(msg)
+		if code != http.StatusOK {
+			mlog.Error(msg)
+		}
 		return &HttpStatus{code: code, msg: msg}
 	}
 }
