@@ -10,7 +10,7 @@ func TestParsePackage(t *testing.T) {
 		t.Fatal(err)
 	}
 	root, _ := os.Getwd()
-	pkg, err := ParsePackage("pkg/model/user", GetModulePath(root))
+	pkg, err := ParsePackage("pkg/model/user", GetGoModule(root))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +22,7 @@ func TestParsePackageWithStream(t *testing.T) {
 		t.Fatal(err)
 	}
 	root, _ := os.Getwd()
-	pkg, err := ParsePackage("pkg/model/page", GetModulePath(root))
+	pkg, err := ParsePackage("pkg/model/page", GetGoModule(root))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func GetModulePath(root string) string {
+func GetGoModule(root string) string {
 	cmd := exec.Command("go", "list", "-m")
 	cmd.Dir = root
 	output, err := cmd.Output()

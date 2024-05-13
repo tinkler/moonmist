@@ -7,7 +7,7 @@ import (
 
 func TestGenerateGoCode(t *testing.T) {
 	root, _ := os.Getwd()
-	modulePath := GetModulePath(root) + "/pkg"
+	modulePath := GetGoModule(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -38,7 +38,7 @@ func TestGenerateGoCode(t *testing.T) {
 func TestGenerateProtoFile(t *testing.T) {
 	_ = os.Chdir("../../")
 	root, _ := os.Getwd()
-	modulePath := GetModulePath(root)
+	modulePath := GetGoModule(root)
 	pkg, err := ParsePackage("./pkg/model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -54,15 +54,15 @@ func TestGenerateProtoFile(t *testing.T) {
 	pkgs := map[string]*Package{"role": pkg2, "user": pkg, "page": pkg3}
 
 	basePath := modulePath
-	err = GenerateProtoFile("./api/proto", basePath, pkg, pkgs)
+	err = GenerateProtoFile("./api/proto", root, basePath, pkg, pkgs)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = GenerateProtoFile("./api/proto", basePath, pkg2, pkgs)
+	err = GenerateProtoFile("./api/proto", root, basePath, pkg2, pkgs)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = GenerateProtoFile("./api/proto", basePath, pkg3, pkgs)
+	err = GenerateProtoFile("./api/proto", root, basePath, pkg3, pkgs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +71,7 @@ func TestGenerateProtoFile(t *testing.T) {
 func TestGenerateGsrv(t *testing.T) {
 	_ = os.Chdir("../../")
 	root, _ := os.Getwd()
-	modulePath := GetModulePath(root)
+	modulePath := GetGoModule(root)
 	pkg, err := ParsePackage("./pkg/model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -102,7 +102,7 @@ func TestGenerateGsrv(t *testing.T) {
 
 func TestGenerateTSCode(t *testing.T) {
 	root, _ := os.Getwd()
-	modulePath := GetModulePath(root) + "/pkg"
+	modulePath := GetGoModule(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -135,7 +135,7 @@ func TestGenerateTSCode(t *testing.T) {
 
 func TestGenerateTSAngularDelonCode(t *testing.T) {
 	root, _ := os.Getwd()
-	modulePath := GetModulePath(root) + "/pkg"
+	modulePath := GetGoModule(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -168,7 +168,7 @@ func TestGenerateTSAngularDelonCode(t *testing.T) {
 
 func TestGenerateDartCode(t *testing.T) {
 	root, _ := os.Getwd()
-	modulePath := GetModulePath(root) + "/pkg"
+	modulePath := GetGoModule(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)
@@ -198,7 +198,7 @@ func TestGenerateDartCode(t *testing.T) {
 
 func TestGenerateSwiftCode(t *testing.T) {
 	root, _ := os.Getwd()
-	modulePath := GetModulePath(root) + "/pkg"
+	modulePath := GetGoModule(root) + "/pkg"
 	pkg, err := ParsePackage("../model/user", modulePath)
 	if err != nil {
 		t.Fatal(err)

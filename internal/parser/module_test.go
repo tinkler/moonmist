@@ -10,7 +10,7 @@ func TestGetModulePath(t *testing.T) {
 		t.Fatal(err)
 	}
 	root, _ := os.Getwd()
-	if GetModulePath(root) != "github.com/tinkler/mqttadmin" {
+	if GetGoModule(root) != "github.com/tinkler/mqttadmin" {
 		t.Fail()
 	}
 }

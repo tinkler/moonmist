@@ -49,7 +49,7 @@ func main() {
 	}
 	conf := internal_moonmist.GetGenConf(viper.GetString(flagFile), root)
 	internal_moonmist.MkdirAll(conf)
-	currentGoModulePath := parser.GetModulePath(root)
+	currentGoModule := parser.GetGoModule(root)
 	allPackages := make(map[string]*parser.Package)
 	runtime.Must(filepath.Walk(conf.Dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -61,7 +61,7 @@ func main() {
 		if conf.Dir == path {
 			return nil
 		}
-		pkg, err := parser.ParsePackage(path, currentGoModulePath)
+		pkg, err := parser.ParsePackage(path, currentGoModule)
 		if err != nil {
 			panic(err)
 		}
@@ -85,9 +85,9 @@ func main() {
 			case "angular_delon":
 				runtime.Must(parser.GenerateTSAngularDelonCode(c.Out, pkg, allPackages))
 			case "proto":
-				runtime.Must(parser.GenerateProtoFile(c.Out, currentGoModulePath, pkg, allPackages))
+				runtime.Must(parser.GenerateProtoFile(c.Out, root, currentGoModule, pkg, allPackages))
 			case "gsrv":
-				runtime.Must(parser.GenerateGsrv(c.Out, currentGoModulePath, pkg, allPackages))
+				runtime.Must(parser.GenerateGsrv(c.Out, currentGoModule, pkg, allPackages))
 			default:
 				panic("unsupported " + c.Type)
 			}
