@@ -185,7 +185,12 @@ func Routes{{.Name | toFulle}}(r chi.Router) {
 	{{range .Structs}}{{$struct := .}}{{range .Methods}}{{if eq .Type 0}}
 	r.Post("/{{$struct.Name | toSnack}}/{{.Name | toMinus}}", func(w http.ResponseWriter, r *http.Request) {
 		m := new({{$struct.Name | toType}})
-		{{if .Args}}gs.Simple2(m, m.{{.Name}}).Handle(w, r)
+		{{$ArgsLen := (.Args | len)}}{{$RetsLen := (.Rets | len)}}
+		{{if (and (ne $ArgsLen 0) (eq $RetsLen 0))}}{{if eq $ArgsLen 1}}gs.Simple2(m, m.{{.Name}}).Handle(w, r){{else if eq $ArgsLen 2}}
+		gs.Simple3(m, m.{{.Name}}).Handle(w, r)
+		{{end}}
+		{{else if (and (ne $ArgsLen 0) (ne $RetsLen 0))}}{{if (and (eq $ArgsLen 1) (eq $RetsLen 1))}}
+		gs.Deliver2(m, m.{{.Name}}).Handle(w, r){{end}}
 		{{else}}gs.Simple(m, m.{{.Name}}).Handle(w, r)
 		{{end}}
 	}){{end}}{{end}}{{end}}

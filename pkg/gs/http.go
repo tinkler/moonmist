@@ -56,6 +56,15 @@ func Simple2[T any, S any](v T, f func(ctx context.Context, args S) error) simpl
 	return simple2[T, S]{v, f}
 }
 
+type simple3[T any, S any, S1 any] struct {
+	v T
+	f func(ctx context.Context, args S, args1 S1) error
+}
+
+func Simple3[T any, S any, S1 any](v T, f func(ctx context.Context, args S, args1 S1) error) simple3[T, S, S1] {
+	return simple3[T, S, S1]{v, f}
+}
+
 func (h simple2[T, S]) Handle(w http.ResponseWriter, r *http.Request) {
 	m := Model[T, S]{Data: h.v}
 	err := Bind(r, &m)
@@ -65,6 +74,26 @@ func (h simple2[T, S]) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 	res := Res[T, any]{Data: m.Data}
 	err = h.f(r.Context(), m.Args)
+	if err != nil {
+		HandleError(w, err)
+		return
+	}
+	HandleResponse(w, res)
+}
+
+func (h simple3[T, S, S1]) Handle(w http.ResponseWriter, r *http.Request) {
+	type customModel struct {
+		Model[T, S]
+		Args1 S1
+	}
+	m := customModel{Model: Model[T, S]{Data: h.v}}
+	err := Bind(r, &m)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	res := Res[T, any]{Data: m.Data}
+	err = h.f(r.Context(), m.Args, m.Args1)
 	if err != nil {
 		HandleError(w, err)
 		return
