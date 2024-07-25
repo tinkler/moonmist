@@ -1,9 +1,11 @@
 package mst
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/tinkler/moonmist/pkg/mlog"
+	"gorm.io/gorm"
 )
 
 func New(code int, v ...interface{}) Status {
@@ -54,6 +56,9 @@ func Any(err error, v ...interface{}) Status {
 	case *HttpStatus:
 		return err.(Status)
 	default:
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return OK("no data")
+		}
 		return InternalServerError(err)
 	}
 }

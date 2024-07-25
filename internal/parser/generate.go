@@ -1447,7 +1447,10 @@ func GenerateDartCode(path string, pkg *Package, dep map[string]*Package) error 
 			return strings.HasPrefix(goType, "*")
 		},
 		"toDefaultType": func(goType string) string {
-			return dartTypeMap[goType]
+			if strings.HasPrefix(goType, "[]") {
+				return ""
+			}
+			return " as " + dartTypeMap[goType]
 		},
 		"toDefault": func(goType string) string {
 			if strings.HasPrefix(goType, "*") {
@@ -1458,7 +1461,7 @@ func GenerateDartCode(path string, pkg *Package, dep map[string]*Package) error 
 				return typ
 			}
 			if strings.HasPrefix(goType, "[]") {
-				return "[]"
+				return "<" + strings.TrimPrefix(goType, "[]") + ">" + "[]"
 			}
 			if dep != nil {
 				if nameSplice := strings.Split(goType, "."); len(nameSplice) > 1 {
@@ -1663,7 +1666,7 @@ class {{.Name}} {
 		});
 		var responseModel = {{$struct.Name}}.fromJson(response.data['data']);
 		{{if .Rets}}if (response.data['resp'] != null) {
-			return (responseModel,{{(index .Rets 0).Type | returnArgs}} as {{(index .Rets 0).Type | toDefaultType}});
+			return (responseModel,{{(index .Rets 0).Type | returnArgs}}{{(index .Rets 0).Type | toDefaultType}});
 		}
 		{{end}}
 		{{if .Rets}} return (responseModel, {{(index .Rets 0).Type | toDefault}});
